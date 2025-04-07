@@ -243,10 +243,10 @@
     <div class="game-container">
         <h1>Kvízová Hra</h1>
         <div class="categories">
-            <div class="category">GEOGRAFIA</div>
+            <div class="category">HISTÓRIA</div>
             <div class="category">VESMÍR</div>
             <div class="category">SERIÁLY</div>
-            <div class="category">HISTÓRIA</div>
+            <div class="category">GEOGRAFIA</div>
             <div class="category">HRY</div>
         </div>
         <div class="questions-grid" id="questionsGrid"></div>
@@ -256,11 +256,11 @@
                 <div class="score">0 bodov</div>
             </div>
             <div class="player" id="player2">
-                <h2>Lucka</h2>
+                <h2>Martin</h2>
                 <div class="score">0 bodov</div>
             </div>
             <div class="player" id="player3">
-                <h2>Emka</h2>
+                <h2>Lucka</h2>
                 <div class="score">0 bodov</div>
             </div>
         </div>
@@ -297,29 +297,29 @@
 
     <script>
         const questionsDatabase = {
-           "GEOGRAFIA": {
-    20: [
-        {
-            question: "Aký je najväčší oceán na Zemi?",
-            options: ["Atlantický oceán", "Indický oceán", "Tichý oceán", "Severný ľadový oceán"],
-            correct: "c"
-        }
-    ],
-    40: [
-        {
-            question: "Ktorá rieka je najdlhšia na svete?",
-            options: ["Amazonka", "Níl", "Ganga", "Mississippi"],
-            correct: "b"
-        }
-    ],
-    60: [
-        {
-            question: "Ktorý kontinent má najväčšiu rozlohu?",
-            options: ["Ázia", "Afrika", "Severná Amerika", "Európa"],
-            correct: "a"
-        }
-    ]
-},
+            HISTÓRIA: {
+                20: [
+                    {
+                        question: "Kto bol prvým prezidentom Slovenskej republiky?",
+                        options: ["Vladimír Mečiar", "Michal Kováč", "Rudolf Schuster", "Andrej Kiska"],
+                        correct: "b"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Kedy sa uskutočnila Nežná revolúcia?",
+                        options: ["1987", "1989", "1990", "1992"],
+                        correct: "b"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Kto bol generálnym tajomníkom Komunistickej strany Československa počas Pražskej jari v roku 1968?",
+                        options: ["Alexander Dubček", "Gustáv Husák", "Ludvik Svoboda", "Miloš Jakeš"],
+                        correct: "a"
+                    }
+                ]
+            },
             VESMÍR: {
                 20: [
                     {
@@ -366,29 +366,29 @@
                     }
                 ]
             },
-"HISTÓRIA": {
-    20: [
-        {
-            question: "Kto bol prvým prezidentom Slovenskej republiky?",
-            options: ["Vladimír Mečiar", "Michal Kováč", "Rudolf Schuster", "Andrej Kiska"],
-            correct: "b"
-        }
-    ],
-    40: [
-        {
-            question: "Kedy sa uskutočnila Nežná revolúcia?",
-            options: ["1987", "1989", "1990", "1992"],
-            correct: "b"
-        }
-    ],
-    60: [
-        {
-            question: "Kto bol generálnym tajomníkom Komunistickej strany Československa počas Pražskej jari v roku 1968?",
-            options: ["Alexander Dubček", "Gustáv Husák", "Ludvik Svoboda", "Miloš Jakeš"],
-            correct: "a"
-        }
-    ]
-}
+            GEOGRAFIA: {
+                20: [
+                    {
+                        question: "Aký je najväčší oceán na Zemi?",
+                        options: ["Atlantický oceán", "Indický oceán", "Tichý oceán", "Severný ľadový oceán"],
+                        correct: "c"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Ktorá rieka je najdlhšia na svete?",
+                        options: ["Amazonka", "Níl", "Ganga", "Mississippi"],
+                        correct: "b"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Ktorý kontinent má najväčšiu rozlohu?",
+                        options: ["Ázia", "Afrika", "Severná Amerika", "Európa"],
+                        correct: "a"
+                    }
+                ]
+            },
             HRY: {
                 20: [
                     {
@@ -414,13 +414,13 @@
             }
         };
 
-        const categories = ["GEOGRAFIA", "VESMÍR", "SERIÁLY", "HISTÓRIA", "HRY"];
+        const categories = ["HISTÓRIA", "VESMÍR", "SERIÁLY", "GEOGRAFIA", "HRY"];
         const values = [20, 40, 60];
         let currentPlayer = 0;
         const players = [
             { name: "Sabi", score: 0, element: document.getElementById("player1"), usedDouble: false, usedPass: false },
-            { name: "Lucka", score: 0, element: document.getElementById("player2"), usedDouble: false, usedPass: false },
-            { name: "Emka", score: 0, element: document.getElementById("player3"), usedDouble: false, usedPass: false }
+            { name: "Martin", score: 0, element: document.getElementById("player2"), usedDouble: false, usedPass: false },
+            { name: "Lucka", score: 0, element: document.getElementById("player3"), usedDouble: false, usedPass: false }
         ];
 
         function initGame() {
