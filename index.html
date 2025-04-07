@@ -243,7 +243,7 @@
     <div class="game-container">
         <h1>Kvízová Hra</h1>
         <div class="categories">
-            <div class="category">ÚČTOVNÍCTVO</div>
+            <div class="category">GEOGRAFIA</div>
             <div class="category">VESMÍR</div>
             <div class="category">SERIÁLY</div>
             <div class="category">HISTÓRIA</div>
@@ -252,15 +252,15 @@
         <div class="questions-grid" id="questionsGrid"></div>
         <div class="players">
             <div class="player" id="player1">
-                <h2>Katka</h2>
+                <h2>Sabi</h2>
                 <div class="score">0 bodov</div>
             </div>
             <div class="player" id="player2">
-                <h2>Martin</h2>
+                <h2>Lucka</h2>
                 <div class="score">0 bodov</div>
             </div>
             <div class="player" id="player3">
-                <h2>Táňa</h2>
+                <h2>Emka</h2>
                 <div class="score">0 bodov</div>
             </div>
         </div>
@@ -297,29 +297,29 @@
 
     <script>
         const questionsDatabase = {
-            ÚČTOVNÍCTVO: {
-                20: [
-                    {
-                        question: "Koľko je odpisových tried?",
-                        options: ["4", "5", "6", "7"],
-                        correct: "d"
-                    }
-                ],
-                40: [
-                    {
-                        question: "V ktorom roku sa zmenilo zaokrúhlovanie pri daňových odpisov?",
-                        options: ["2018", "2019", "2020", "2022"],
-                        correct: "c"
-                    }
-                ],
-                60: [
-                    {
-                        question: "Kto je považovaný za otca účtovníctva?",
-                        options: ["Stephanio Moneli", "Luca Pacioli", "Adam Smith", "Leonardo da Vinci"],
-                        correct: "b"
-                    }
-                ]
-            },
+           "GEOGRAFIA": {
+    20: [
+        {
+            question: "Aký je najväčší oceán na Zemi?",
+            options: ["Atlantický oceán", "Indický oceán", "Tichý oceán", "Severný ľadový oceán"],
+            correct: "c"
+        }
+    ],
+    40: [
+        {
+            question: "Ktorá rieka je najdlhšia na svete?",
+            options: ["Amazonka", "Níl", "Ganga", "Mississippi"],
+            correct: "b"
+        }
+    ],
+    60: [
+        {
+            question: "Ktorý kontinent má najväčšiu rozlohu?",
+            options: ["Ázia", "Afrika", "Severná Amerika", "Európa"],
+            correct: "a"
+        }
+    ]
+},
             VESMÍR: {
                 20: [
                     {
@@ -414,7 +414,7 @@
             }
         };
 
-        const categories = ["ÚČTOVNÍCTVO", "VESMÍR", "SERIÁLY", "HISTÓRIA", "HRY"];
+        const categories = ["GEOGRAFIA", "VESMÍR", "SERIÁLY", "HISTÓRIA", "HRY"];
         const values = [20, 40, 60];
         let currentPlayer = 0;
         const players = [
