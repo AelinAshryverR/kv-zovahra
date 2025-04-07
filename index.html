@@ -1,35 +1,700 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Kvízová Hra</title>
     <style>
-        /* Základné štýly pre hru */
-        .question-value {
-            display: inline-block;
-            width: 80px;
-            height: 80px;
+        body {
+            font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            text-align: center;
-            line-height: 80px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 5px;
+            margin: 0;
+            padding: 20px;
         }
-        #questionsGrid {
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .categories {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .category {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            width: 18%;
+        }
+        .questions-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
+            margin-bottom: 20px;
+        }
+        .question-value {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .question-value:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+        }
+        .question-value.used {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .players {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .player {
+            background-color: #f1c40f;
+            padding: 15px;
+            border-radius: 5px;
+            width: 30%;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .player.active {
+            background-color: #e67e22;
+            color: white;
+            font-weight: bold;
+        }
+        .pass-used {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 80%;
+        }
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .double-btn {
+            background-color: #8e44ad;
+            color: white;
+            margin: 10px 0;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .double-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .pass-btn {
+            background-color: #e74c3c;
+            color: white;
+            margin: 10px 0;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .pass-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .player-select-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 150;
+            justify-content: center;
+            align-items: center;
+        }
+        .player-select-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 80%;
+        }
+        .player-option {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .player-option:hover {
+            background-color: #2980b9;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+            z-index: 10;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        .result-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 80%;
+            text-align: center;
+            position: relative;
+        }
+        .winner {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e67e22;
+            margin-bottom: 20px;
+        }
+        .scores {
+            margin-bottom: 20px;
+        }
+        .restart-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Kvízová Hra</h1>
-    <div id="questionsGrid"></div>
-    <div id="questionContainer"></div>
-    <div id="players"></div>
+    <div class="game-container">
+        <h1>Kvízová Hra</h1>
+        <div class="categories">
+            <div class="category">ÚČTOVNÍCTVO</div>
+            <div class="category">VESMÍR</div>
+            <div class="category">SERIÁLY</div>
+            <div class="category">EUBA</div>
+            <div class="category">HRY</div>
+        </div>
+        <div class="questions-grid" id="questionsGrid"></div>
+        <div class="players">
+            <div class="player" id="player1">
+                <h2>Katka</h2>
+                <div class="score">0 bodov</div>
+            </div>
+            <div class="player" id="player2">
+                <h2>Martin</h2>
+                <div class="score">0 bodov</div>
+            </div>
+            <div class="player" id="player3">
+                <h2>Táňa</h2>
+                <div class="score">0 bodov</div>
+            </div>
+        </div>
+    </div>
 
-    <script src="game.js"></script>
+    <div class="modal" id="questionModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 id="modalCategory"></h2>
+            <h3 id="modalValue"></h3>
+            <p id="modalQuestion"></p>
+            <div class="options" id="answerOptions"></div>
+            <button class="double-btn" id="doublePointsBtn">Použiť dvojnásobok bodov</button>
+            <button class="pass-btn" id="passQuestionBtn">Presunúť otázku inému hráčovi</button>
+            <p id="resultMessage"></p>
+        </div>
+    </div>
+
+    <div class="player-select-modal" id="playerSelectModal">
+        <div class="player-select-content">
+            <h2>Vyberte hráča</h2>
+            <div id="playerOptions"></div>
+        </div>
+    </div>
+
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <h2>Koniec hry!</h2>
+            <div class="winner" id="winnerText"></div>
+            <div class="scores" id="scoresText"></div>
+            <button class="restart-btn" id="restartBtn">Hrať znova</button>
+        </div>
+    </div>
+
+    <script>
+        const questionsDatabase = {
+            ÚČTOVNÍCTVO: {
+                20: [
+                    {
+                        question: "Koľko je odpisových tried?",
+                        options: ["4", "5", "6", "7"],
+                        correct: "d"
+                    }
+                ],
+                40: [
+                    {
+                        question: "V ktorom roku sa zmenilo zaokrúhlovanie pri daňových odpisov?",
+                        options: ["2018", "2019", "2020", "2022"],
+                        correct: "c"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Kto je považovaný za otca účtovníctva?",
+                        options: ["Stephanio Moneli", "Luca Pacioli", "Adam Smith", "Leonardo da Vinci"],
+                        correct: "b"
+                    }
+                ]
+            },
+            VESMÍR: {
+                20: [
+                    {
+                        question: "Ktorá planéta je najbližšie k Slnku?",
+                        options: ["Venuša", "Mars", "Merkúr", "Zem"],
+                        correct: "c"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Ktorá planéta má najviac mesiacov?",
+                        options: ["Saturn", "Jupiter", "Neptún", "Mars"],
+                        correct: "a"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Aká je priemerná vzdialenosť medzi Zemou a Slnkom (miliónov km)?",
+                        options: ["93", "120", "150", "180"],
+                        correct: "a"
+                    }
+                ]
+            },
+            SERIÁLY: {
+                20: [
+                    {
+                        question: "Ako sa volá fiktívne mesto v seriáli Simpsonovci?",                        
+                        options: ["Sprinfield", "Hollywood", "Greenfield", "Misteryfield"],
+                        correct: "a"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Ako sa volá ženská postava v Teórií veľkého tresku, ktorá dostala Nobelovu cenu?",
+                        options: ["Bernadette", "Penny", "Amy", "Pria"],
+                        correct: "c"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Kto hral Waltera Whitea v seriáli Breaking Bad?",
+                        options: ["Bryan Cranston", "Auron Poul", "Bob Odenkirk", "Bryan Jones"],
+                        correct: "a"
+                    }
+                ]
+            },
+            "EUBA": {
+                20: [
+                    {
+                        question: "Koľko kreditov potrebujete minimálne na urobenie bakalárskeho štúdia",
+                        options: ["160", "170", "180", "190"],
+                        correct: "c"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Ako sa volal prvý učiteľ/učiteľka účtovníctva na EUBE s ktorým ste mali prednášky",
+                        options: ["Jitka", "Ján", "Peter", "Martina"],
+                        correct: "a"
+                    }
+                ],
+                60: [
+                    {
+                        question: "Kedy vznikla Katedra zameraná na účtovníctvo na EUBE",
+                        options: ["1952", "1963", "1971", "1977"],
+                        correct: "a"
+                    }
+                ]
+            },
+            HRY: {
+                20: [
+                    {
+                        question: "Ktorá hra používa malé plastové domčeky a cesty na mape?",
+                        options: ["Monopoly", "Dostihy a sázky", "Vlakmi po Európe", "Človeče nehnevaj sa"],
+                        correct: "a"
+                    }
+                ],
+                40: [
+                    {
+                        question: "Kde vznikol už legendárny tetris",
+                        options: ["USA", "Nemecku", "Veľkej Britání", "Sovietskom zväze"],
+                        correct: "d"
+                    }
+                ],
+                60: [
+                    {
+                        question: "V ktorom GTA sa prvý krát objavil CJ",
+                        options: ["GTA Vice City", "GTA San Andreas", "GTA LA", "GTA 5"],
+                        correct: "b"
+                    }
+                ]
+            }
+        };
+
+        const categories = ["ÚČTOVNÍCTVO", "VESMÍR", "SERIÁLY", "EUBA", "HRY"];
+        const values = [20, 40, 60];
+        let currentPlayer = 0;
+        const players = [
+            { name: "Katka", score: 0, element: document.getElementById("player1"), usedDouble: false, usedPass: false },
+            { name: "Martin", score: 0, element: document.getElementById("player2"), usedDouble: false, usedPass: false },
+            { name: "Táňa", score: 0, element: document.getElementById("player3"), usedDouble: false, usedPass: false }
+        ];
+
+        function initGame() {
+            const grid = document.getElementById("questionsGrid");
+            grid.innerHTML = "";
+
+            values.forEach(value => {
+                categories.forEach(category => {
+                    const div = document.createElement("div");
+                    div.className = "question-value";
+                    div.textContent = value;
+                    div.dataset.category = category;
+                    div.dataset.value = value;
+                    div.dataset.used = "false";
+                    div.addEventListener("click", () => {
+                        if (div.dataset.used === "false") {
+                            showQuestion(category, value, div);
+                        }
+                    });
+                    grid.appendChild(div);
+                });
+            });
+
+            updatePlayers();
+        }
+
+        function showQuestion(category, value, element) {
+            const modal = document.getElementById("questionModal");
+            const questionSet = questionsDatabase[category]?.[value];
+            if (!questionSet || questionSet.length === 0) {
+                alert("Otázky nie sú dostupné.");
+                return;
+            }
+
+            const random = questionSet[Math.floor(Math.random() * questionSet.length)];
+            modal.dataset.correct = random.correct;
+            modal.dataset.value = value;
+            modal.dataset.category = category;
+            modal.dataset.elementId = element.dataset.category + "-" + element.dataset.value;
+
+            document.getElementById("modalCategory").textContent = category;
+            document.getElementById("modalValue").textContent = `${value} bodov`;
+            document.getElementById("modalQuestion").textContent = random.question;
+
+            const optionsDiv = document.getElementById("answerOptions");
+            optionsDiv.innerHTML = "";
+            ["a", "b", "c", "d"].forEach((key, i) => {
+                const btn = document.createElement("button");
+                btn.textContent = `${key.toUpperCase()}: ${random.options[i]}`;
+                btn.addEventListener("click", () => checkAnswer(key));
+                optionsDiv.appendChild(btn);
+            });
+
+            const doubleBtn = document.getElementById("doublePointsBtn");
+            doubleBtn.disabled = players[currentPlayer].usedDouble;
+            doubleBtn.onclick = () => {
+                players[currentPlayer].usedDouble = true;
+                doubleBtn.disabled = true;
+                modal.dataset.double = "true";
+                updatePlayers();
+            };
+
+            const passBtn = document.getElementById("passQuestionBtn");
+            passBtn.disabled = players[currentPlayer].usedPass;
+            passBtn.onclick = () => {
+                if (!players[currentPlayer].usedPass) {
+                    players[currentPlayer].usedPass = true;
+                    passBtn.disabled = true;
+                    showPlayerSelectModal();
+                    updatePlayers();
+                }
+            };
+
+            document.getElementById("resultMessage").textContent = "";
+            modal.style.display = "flex";
+        }
+
+        function showPlayerSelectModal() {
+            const playerSelectModal = document.getElementById("playerSelectModal");
+            const playerOptions = document.getElementById("playerOptions");
+            playerOptions.innerHTML = "";
+            
+            document.getElementById("questionModal").style.display = "none";
+            
+            players.forEach((player, index) => {
+                if (index !== currentPlayer) {
+                    const option = document.createElement("div");
+                    option.className = "player-option";
+                    option.textContent = player.name;
+                    option.addEventListener("click", () => {
+                        selectPlayer(index);
+                    });
+                    playerOptions.appendChild(option);
+                }
+            });
+            
+            playerSelectModal.style.display = "flex";
+        }
+
+        function selectPlayer(playerIndex) {
+            currentPlayer = playerIndex;
+            updatePlayers();
+            
+            document.getElementById("resultMessage").textContent = `Otázka bola presunutá hráčovi ${players[currentPlayer].name}`;
+            document.getElementById("resultMessage").style.color = "blue";
+            
+            document.getElementById("playerSelectModal").style.display = "none";
+            document.getElementById("questionModal").style.display = "flex";
+        }
+
+        function checkAnswer(selected) {
+            const modal = document.getElementById("questionModal");
+            const correct = modal.dataset.correct;
+            const result = document.getElementById("resultMessage");
+            const value = parseInt(modal.dataset.value);
+            const isDouble = modal.dataset.double === "true";
+            const finalPoints = isDouble ? value * 2 : value;
+
+            if (selected === correct) {
+                players[currentPlayer].score += finalPoints;
+                result.textContent = `Správne! +${finalPoints} bodov`;
+                result.style.color = "green";
+            } else {
+                players[currentPlayer].score -= finalPoints;
+                result.textContent = `Nesprávne! -${finalPoints} bodov. Správna odpoveď bola ${correct.toUpperCase()}`;
+                result.style.color = "red";
+            }
+
+            const category = modal.dataset.category;
+            const all = document.querySelectorAll(".question-value");
+            all.forEach(el => {
+                if (el.dataset.category === category && el.dataset.value == value) {
+                    el.dataset.used = "true";
+                    el.classList.add("used");
+                }
+            });
+
+            setTimeout(() => {
+                modal.style.display = "none";
+                currentPlayer = (currentPlayer + 1) % players.length;
+                updatePlayers();
+                checkGameEnd();
+            }, 2000);
+        }
+
+        function checkGameEnd() {
+            const allQuestions = document.querySelectorAll('.question-value');
+            const unusedQuestions = Array.from(allQuestions).filter(q => q.dataset.used === "false");
+            
+            if (unusedQuestions.length === 0) {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            const resultModal = document.getElementById("resultModal");
+            const winnerText = document.getElementById("winnerText");
+            const scoresText = document.getElementById("scoresText");
+            
+            let maxScore = -1;
+            let winners = [];
+            
+            players.forEach(player => {
+                if (player.score > maxScore) {
+                    maxScore = player.score;
+                    winners = [player.name];
+                } else if (player.score === maxScore) {
+                    winners.push(player.name);
+                }
+            });
+            
+            if (winners.length === 1) {
+                winnerText.textContent = `Víťaz: ${winners[0]} s ${maxScore} bodmi!`;
+                createConfetti();
+            } else {
+                winnerText.textContent = `Remíza! Hráči ${winners.join(", ")} s ${maxScore} bodmi!`;
+            }
+            
+            let scoresHTML = "<h3>Výsledky:</h3><ul>";
+            players.forEach(player => {
+                scoresHTML += `<li>${player.name}: ${player.score} bodov</li>`;
+            });
+            scoresHTML += "</ul>";
+            scoresText.innerHTML = scoresHTML;
+            
+            resultModal.style.display = "flex";
+        }
+
+        function createConfetti() {
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+            const container = document.querySelector('.game-container');
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `-10px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(confetti);
+            }
+        }
+
+        function updatePlayers() {
+            players.forEach((player, i) => {
+                player.element.querySelector(".score").textContent = player.score + " bodov";
+                
+                // Odstrániť staré indikátory
+                const oldPassUsed = player.element.querySelector(".pass-used");
+                if (oldPassUsed) oldPassUsed.remove();
+                
+                // Pridať indikátor použitého presunu
+                if (player.usedPass) {
+                    const passUsed = document.createElement("div");
+                    passUsed.className = "pass-used";
+                    passUsed.textContent = "✓";
+                    passUsed.title = "Použil presun otázky";
+                    player.element.appendChild(passUsed);
+                }
+                
+                if (i === currentPlayer) {
+                    player.element.classList.add("active");
+                    player.element.style.boxShadow = "0 0 0 3px #e67e22";
+                } else {
+                    player.element.classList.remove("active");
+                    player.element.style.boxShadow = "";
+                }
+            });
+        }
+
+        document.getElementById("closeModal").addEventListener("click", () => {
+            const modal = document.getElementById("questionModal");
+            const value = parseInt(modal.dataset.value);
+            const halfPoints = Math.floor(value / 2);
+            
+            players[currentPlayer].score -= halfPoints;
+            
+            const result = document.getElementById("resultMessage");
+            result.textContent = `Otázka zatvorená! -${halfPoints} bodov`;
+            result.style.color = "orange";
+            
+            const category = modal.dataset.category;
+            const all = document.querySelectorAll(".question-value");
+            all.forEach(el => {
+                if (el.dataset.category === category && el.dataset.value == value) {
+                    el.dataset.used = "true";
+                    el.classList.add("used");
+                }
+            });
+            
+            setTimeout(() => {
+                modal.style.display = "none";
+                currentPlayer = (currentPlayer + 1) % players.length;
+                updatePlayers();
+                checkGameEnd();
+            }, 1500);
+        });
+
+        document.getElementById("restartBtn").addEventListener("click", () => {
+            document.getElementById("resultModal").style.display = "none";
+            document.querySelectorAll('.confetti').forEach(el => el.remove());
+            
+            players.forEach(player => {
+                player.score = 0;
+                player.usedDouble = false;
+                player.usedPass = false;
+            });
+            currentPlayer = 0;
+            
+            initGame();
+        });
+
+        window.onload = initGame;
+    </script>
 </body>
 </html>
