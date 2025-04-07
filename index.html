@@ -246,7 +246,7 @@
             <div class="category">ÚČTOVNÍCTVO</div>
             <div class="category">VESMÍR</div>
             <div class="category">SERIÁLY</div>
-            <div class="category">EUBA</div>
+            <div class="category">HISTÓRIA</div>
             <div class="category">HRY</div>
         </div>
         <div class="questions-grid" id="questionsGrid"></div>
@@ -366,29 +366,29 @@
                     }
                 ]
             },
-            "EUBA": {
-                20: [
-                    {
-                        question: "Koľko kreditov potrebujete minimálne na urobenie bakalárskeho štúdia",
-                        options: ["160", "170", "180", "190"],
-                        correct: "c"
-                    }
-                ],
-                40: [
-                    {
-                        question: "Ako sa volal prvý učiteľ/učiteľka účtovníctva na EUBE s ktorým ste mali prednášky",
-                        options: ["Jitka", "Ján", "Peter", "Martina"],
-                        correct: "a"
-                    }
-                ],
-                60: [
-                    {
-                        question: "Kedy vznikla Katedra zameraná na účtovníctvo na EUBE",
-                        options: ["1952", "1963", "1971", "1977"],
-                        correct: "a"
-                    }
-                ]
-            },
+"HISTÓRIA": {
+    20: [
+        {
+            question: "Kto bol prvým prezidentom Slovenskej republiky?",
+            options: ["Vladimír Mečiar", "Michal Kováč", "Rudolf Schuster", "Andrej Kiska"],
+            correct: "b"
+        }
+    ],
+    40: [
+        {
+            question: "Kedy sa uskutočnila Nežná revolúcia?",
+            options: ["1987", "1989", "1990", "1992"],
+            correct: "b"
+        }
+    ],
+    60: [
+        {
+            question: "Kto bol generálnym tajomníkom Komunistickej strany Československa počas Pražskej jari v roku 1968?",
+            options: ["Alexander Dubček", "Gustáv Husák", "Ludvik Svoboda", "Miloš Jakeš"],
+            correct: "a"
+        }
+    ]
+}
             HRY: {
                 20: [
                     {
@@ -414,13 +414,13 @@
             }
         };
 
-        const categories = ["ÚČTOVNÍCTVO", "VESMÍR", "SERIÁLY", "EUBA", "HRY"];
+        const categories = ["ÚČTOVNÍCTVO", "VESMÍR", "SERIÁLY", "HISTÓRIA", "HRY"];
         const values = [20, 40, 60];
         let currentPlayer = 0;
         const players = [
-            { name: "Katka", score: 0, element: document.getElementById("player1"), usedDouble: false, usedPass: false },
-            { name: "Martin", score: 0, element: document.getElementById("player2"), usedDouble: false, usedPass: false },
-            { name: "Táňa", score: 0, element: document.getElementById("player3"), usedDouble: false, usedPass: false }
+            { name: "Sabi", score: 0, element: document.getElementById("player1"), usedDouble: false, usedPass: false },
+            { name: "Lucka", score: 0, element: document.getElementById("player2"), usedDouble: false, usedPass: false },
+            { name: "Emka", score: 0, element: document.getElementById("player3"), usedDouble: false, usedPass: false }
         ];
 
         function initGame() {
