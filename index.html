@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kvízová Hra</title>
     <style>
         body {
@@ -99,28 +99,28 @@
             cursor: pointer;
             font-size: 24px;
         }
-        .options button {
+        #answerOptions button {
             display: block;
-            width: 100%;
-            margin: 5px 0;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .double-btn {
-            background-color: #8e44ad;
-            color: white;
             margin: 10px 0;
             padding: 10px;
-            cursor: pointer;
+            width: 100%;
             border: none;
             border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
-        .double-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        #doublePointsBtn {
+            margin-top: 10px;
+            background-color: #9b59b6 !important;
+        }
+        #winnerAnnouncement {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 30px;
+            font-weight: bold;
+            color: #2c3e50;
         }
     </style>
 </head>
@@ -149,194 +149,124 @@
                 <div class="score">0 bodov</div>
             </div>
         </div>
+        <div id="winnerAnnouncement"></div>
     </div>
-
     <div class="modal" id="questionModal">
         <div class="modal-content">
             <span class="close-btn" id="closeModal">&times;</span>
             <h2 id="modalCategory"></h2>
             <h3 id="modalValue"></h3>
             <p id="modalQuestion"></p>
-            <div class="options" id="answerOptions"></div>
-            <button class="double-btn" id="doublePointsBtn">Použiť dvojnásobok bodov</button>
+            <div id="answerOptions"></div>
+            <button id="doublePointsBtn">Použiť dvojnásobné body</button>
             <p id="resultMessage"></p>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        const questionsDatabase = {
-            FILMY: {
-                20: [
-                    {
-                        question: "Kto režíroval film Pulp Fiction?",
-                        options: ["Steven Spielberg", "Quentin Tarantino", "Martin Scorsese", "Christopher Nolan"],
-                        correct: "b"
-                    }
-                ],
-                40: [
-                    {
-                        question: "V ktorom roku vyšiel film Titanic?",
-                        options: ["1995", "1997", "1999", "2001"],
-                        correct: "b"
-                    }
-                ],
-                60: [
-                    {
-                        question: "Kto hral hlavnú rolu vo filme Matrix?",
-                        options: ["Brad Pitt", "Leonardo DiCaprio", "Keanu Reeves", "Tom Cruise"],
-                        correct: "c"
-                    }
-                ]
-            },
-            VIDEOHRY: {
-                20: [
-                    {
-                        question: "Kto vytvoril Minecraft?",
-                        options: ["Notch", "Mojang", "Epic Games", "Valve"],
-                        correct: "b"
-                    }
-                ],
-                40: [
-                    {
-                        question: "Ako sa volá hlavná postava v sérii The Legend of Zelda?",
-                        options: ["Zelda", "Link", "Ganon", "Navi"],
-                        correct: "b"
-                    }
-                ],
-                60: [
-                    {
-                        question: "Ktorá hra je najpredávanejšia?",
-                        options: ["GTA V", "Tetris", "Minecraft", "FIFA"],
-                        correct: "c"
-                    }
-                ]
-            }
-        };
-
-        const categories = ["FILMY", "VIDEOHRY"];
-        const values = [20, 40, 60];
-        let currentPlayer = 0;
-        const players = [
-            { name: "Hráč 1", score: 0, element: document.getElementById("player1"), usedDouble: false },
-            { name: "Hráč 2", score: 0, element: document.getElementById("player2"), usedDouble: false },
-            { name: "Hráč 3", score: 0, element: document.getElementById("player3"), usedDouble: false }
+        const questions = [
+            { category: "FILMY", value: 100, question: "Kto režíroval film Pán prsteňov?", options: ["George Lucas", "Peter Jackson", "Steven Spielberg", "James Cameron"], answer: 1 },
+            { category: "VIDEOHRY", value: 100, question: "Ako sa volá hlavná postava série Halo?", options: ["Master Chief", "Kratos", "Gordon Freeman", "Lara Croft"], answer: 0 },
+            // Pridaj viac otázok podľa potreby
         ];
 
-        function initGame() {
-            const grid = document.getElementById("questionsGrid");
-            grid.innerHTML = "";
+        const players = [
+            { id: "player1", score: 0, usedDouble: false },
+            { id: "player2", score: 0, usedDouble: false },
+            { id: "player3", score: 0, usedDouble: false }
+        ];
 
-            values.forEach(value => {
-                categories.forEach(category => {
-                    const div = document.createElement("div");
-                    div.className = "question-value";
-                    div.textContent = value;
-                    div.dataset.category = category;
-                    div.dataset.value = value;
-                    div.dataset.used = "false";
-                    div.addEventListener("click", () => {
-                        if (div.dataset.used === "false") {
-                            showQuestion(category, value, div);
-                        }
-                    });
-                    grid.appendChild(div);
-                });
+        let currentPlayerIndex = 0;
+        const questionsGrid = document.getElementById("questionsGrid");
+
+        function updateScores() {
+            players.forEach(player => {
+                const element = document.getElementById(player.id).querySelector(".score");
+                element.textContent = `${player.score} bodov`;
             });
-
-            updatePlayers();
         }
 
-        function showQuestion(category, value, element) {
-            const modal = document.getElementById("questionModal");
-            const questionSet = questionsDatabase[category]?.[value];
-            if (!questionSet || questionSet.length === 0) {
-                alert("Otázky nie sú dostupné.");
-                return;
-            }
+        function renderQuestions() {
+            questions.forEach((q, index) => {
+                const btn = document.createElement("div");
+                btn.className = "question-value";
+                btn.textContent = `${q.value}`;
+                btn.dataset.index = index;
+                btn.addEventListener("click", () => openModal(q, btn, index));
+                questionsGrid.appendChild(btn);
+            });
+        }
 
-            const random = questionSet[Math.floor(Math.random() * questionSet.length)];
-            modal.dataset.correct = random.correct;
-            modal.dataset.value = value;
-            modal.dataset.category = category;
-            modal.dataset.elementId = element.dataset.category + "-" + element.dataset.value;
+        function openModal(question, btn, index) {
+            if (btn.classList.contains("used")) return;
 
-            document.getElementById("modalCategory").textContent = category;
-            document.getElementById("modalValue").textContent = `${value} bodov`;
-            document.getElementById("modalQuestion").textContent = random.question;
+            btn.classList.add("used");
+            document.getElementById("modalCategory").textContent = question.category;
+            document.getElementById("modalValue").textContent = `${question.value} bodov`;
+            document.getElementById("modalQuestion").textContent = question.question;
 
             const optionsDiv = document.getElementById("answerOptions");
             optionsDiv.innerHTML = "";
-            ["a", "b", "c", "d"].forEach((key, i) => {
-                const btn = document.createElement("button");
-                btn.textContent = `${key.toUpperCase()}: ${random.options[i]}`;
-                btn.addEventListener("click", () => checkAnswer(key));
-                optionsDiv.appendChild(btn);
+            question.options.forEach((opt, i) => {
+                const optBtn = document.createElement("button");
+                optBtn.textContent = String.fromCharCode(65 + i) + ". " + opt;
+                optBtn.addEventListener("click", () => handleAnswer(i === question.answer, question.value));
+                optionsDiv.appendChild(optBtn);
             });
 
             const doubleBtn = document.getElementById("doublePointsBtn");
-            doubleBtn.disabled = players[currentPlayer].usedDouble;
+            doubleBtn.style.display = players[currentPlayerIndex].usedDouble ? "none" : "block";
             doubleBtn.onclick = () => {
-                players[currentPlayer].usedDouble = true;
+                players[currentPlayerIndex].usedDouble = true;
                 doubleBtn.disabled = true;
-                modal.dataset.double = "true";
             };
-            modal.dataset.double = "false";
 
-            document.getElementById("resultMessage").textContent = "";
-            modal.style.display = "flex";
+            document.getElementById("questionModal").style.display = "flex";
         }
 
-        function checkAnswer(selected) {
-            const modal = document.getElementById("questionModal");
-            const correct = modal.dataset.correct;
-            const result = document.getElementById("resultMessage");
-            const value = parseInt(modal.dataset.value);
-            const isDouble = modal.dataset.double === "true";
-            const finalPoints = isDouble ? value * 2 : value;
-
-            if (selected === correct) {
-                players[currentPlayer].score += finalPoints;
-                result.textContent = `Správne! +${finalPoints} bodov`;
-                result.style.color = "green";
-            } else {
-                result.textContent = `Nesprávne! Správna odpoveď bola ${correct.toUpperCase()}`;
-                result.style.color = "red";
+        function handleAnswer(isCorrect, value) {
+            let points = value;
+            if (!players[currentPlayerIndex].usedDouble && document.getElementById("doublePointsBtn").disabled) {
+                points *= 2;
             }
-
-            const category = modal.dataset.category;
-            const all = document.querySelectorAll(".question-value");
-            all.forEach(el => {
-                if (el.dataset.category === category && el.dataset.value == value) {
-                    el.dataset.used = "true";
-                    el.classList.add("used");
-                }
-            });
-
+            if (isCorrect) {
+                players[currentPlayerIndex].score += points;
+                document.getElementById("resultMessage").textContent = `Správne! +${points} bodov`;
+            } else {
+                document.getElementById("resultMessage").textContent = "Nesprávna odpoveď.";
+            }
+            updateScores();
             setTimeout(() => {
-                modal.style.display = "none";
-                currentPlayer = (currentPlayer + 1) % players.length;
-                updatePlayers();
+                document.getElementById("questionModal").style.display = "none";
+                document.getElementById("resultMessage").textContent = "";
+                nextPlayer();
+                checkEndGame();
             }, 2000);
         }
 
-        function updatePlayers() {
-            players.forEach((player, i) => {
-                player.element.querySelector(".score").textContent = player.score + " bodov";
-                if (i === currentPlayer) {
-                    player.element.classList.add("active");
-                } else {
-                    player.element.classList.remove("active");
-                }
-            });
+        function nextPlayer() {
+            document.getElementById(players[currentPlayerIndex].id).classList.remove("active");
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            document.getElementById(players[currentPlayerIndex].id).classList.add("active");
+        }
+
+        function checkEndGame() {
+            const used = document.querySelectorAll(".question-value.used").length;
+            if (used === questions.length) {
+                const winner = players.reduce((prev, current) => prev.score > current.score ? prev : current);
+                document.getElementById("winnerAnnouncement").textContent = `Víťaz je ${document.getElementById(winner.id).querySelector("h2").textContent} s ${winner.score} bodmi!`;
+                confetti();
+            }
         }
 
         document.getElementById("closeModal").addEventListener("click", () => {
             document.getElementById("questionModal").style.display = "none";
-            currentPlayer = (currentPlayer + 1) % players.length;
-            updatePlayers();
         });
 
-        window.onload = initGame;
+        document.getElementById(players[currentPlayerIndex].id).classList.add("active");
+        updateScores();
+        renderQuestions();
     </script>
 </body>
 </html>
